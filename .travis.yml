@@ -1,0 +1,15 @@
+language: node_js
+before_script:
+- make build
+before_deploy:
+- make archive
+deploy:
+  provider: releases
+  api_key:
+    secure:
+  file: build/JsonSchemaFakerDynamicValue.zip
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    repo: luckymarmot/Paw-JSONSchemaFakerDynamicValue
