@@ -1,11 +1,12 @@
-import { UnitTest, registerTest } from '../../__utils__/TestUtils'
+import { UnitTest, registerTest, against } from '../../__utils__/TestUtils'
 
 import {
 	PawContextMock,
     InputField
-} from '../Mocks'
+} from '../PawMocks'
 
 @registerTest
+@against(PawContextMock)
 export class TestPawContextMock extends UnitTest {
     testEmptyPawContextMock() {
         const pawContextFields = [
@@ -40,6 +41,7 @@ export class TestPawContextMock extends UnitTest {
 }
 
 @registerTest
+@against(InputField)
 export class TestInputFieldMock extends UnitTest {
     testSimpleInputFieldMock() {
         const pawInputFieldFields = []
@@ -51,6 +53,6 @@ export class TestInputFieldMock extends UnitTest {
             [ 'spy', 'key', 'name', 'type', 'options', 'spyOn', 'getSpy' ]
         )
 
-        this.assertEqual(Object.keys(mock.spy), pawDynamicValueFields)
+        this.assertEqual(Object.keys(mock.spy), pawInputFieldFields)
     }
 }

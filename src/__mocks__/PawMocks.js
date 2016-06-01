@@ -34,7 +34,6 @@ export class InputField extends Mock {
             type: type,
             options: options
         }
-        Object.assign(obj, baseObj)
         super(obj, prefix)
     }
 }

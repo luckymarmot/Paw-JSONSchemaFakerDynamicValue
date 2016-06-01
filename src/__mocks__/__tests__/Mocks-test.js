@@ -1,10 +1,13 @@
-import { UnitTest, registerTest } from '../../__utils__/TestUtils'
+import {
+	UnitTest, registerTest, against
+} from '../../__utils__/TestUtils'
 
 import {
 	Mock
 } from '../Mocks'
 
 @registerTest
+@against(Mock)
 export class TestMock extends UnitTest {
     testSimpleMock() {
         let mock = new Mock()
@@ -70,7 +73,7 @@ export class TestMock extends UnitTest {
 
         let mock = new Mock(obj)
 
-        mock.$$_spyOn(
+        mock.spyOn(
             'a',
             (arg) => {
                 return arg * 2
@@ -99,7 +102,7 @@ export class TestMock extends UnitTest {
 
         let mock = new Mock(obj)
 
-        mock.$$_spyOn(
+        mock.spyOn(
             'a',
             (arg) => {
                 return arg * 2

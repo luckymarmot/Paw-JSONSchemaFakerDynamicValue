@@ -176,7 +176,7 @@ function targets(name) {
     }
 }
 
-function against(Against, ignores = []) {
+function against(Against, ignores = [ 'constructor' ]) {
     return function(Class) {
         Class.__against = Against
         Class.prototype.testAllMethodsAreTested = () => {
@@ -187,15 +187,18 @@ function against(Against, ignores = []) {
             let missingTests = []
             for (let name of names) {
                 if (
-                    typeof Class.__targets[name] === 'undefined' &&
-                    ignores.indexOf(name) < 0
+                    ignores.indexOf(name) < 0 &&
+                    (
+                        typeof Class.__targets === 'undefined' ||
+                        typeof Class.__targets[name] === 'undefined'
+                    )
                 ) {
                     missingTests.push(name)
                 }
             }
 
             let superfluousTests = []
-            for (let target of Object.keys(Class.__targets)) {
+            for (let target of Object.keys(Class.__targets || {})) {
                 if (names.indexOf(target) < 0) {
                     superfluousTests.push(Class.__targets[target])
                 }
@@ -211,34 +214,4 @@ function against(Against, ignores = []) {
     }
 }
 
-class MockedFunction {
-    constructor() {
-        this.calls = []
-        this.returnValue = null
-    }
-
-    setReturnValue(value) {
-        this.returnValue = value
-    }
-
-    func() {
-        this.calls.push(arguments)
-        return this.returnValue
-    }
-
-    getCallBack = ()=> {
-        return ::this.func
-    };
-}
-
-function mockFunction(target, key, descriptor) {
-    const fn = descriptor.value
-    descriptor.value = function() {
-        const mockedFunction = new MockedFunction()
-        return fn.apply(this,
-          Immutable.List(arguments).push(mockedFunction).toJS())
-    }
-    return descriptor
-}
-
-export { UnitTest, registerTest, targets, against, mockFunction }
+export { UnitTest, registerTest, targets, against }

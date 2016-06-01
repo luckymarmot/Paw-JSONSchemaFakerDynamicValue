@@ -1,13 +1,12 @@
-import jsf from 'json-schema-faker';
+import jsf from 'json-schema-faker'
 
 import {
     registerDynamicValueClass,
-    InputField,
-    DynamicValueInput
+    InputField
 } from './__mocks__/Shims'
 
 @registerDynamicValueClass
-class JSONSchemaFakerDynamicValue {
+export class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
     static title = 'JSON Schema Faker'
@@ -15,12 +14,12 @@ class JSONSchemaFakerDynamicValue {
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
     static inputs = [
-        InputField('schema', 'Schema', 'JSON', {persisted: true}),
-        DynamicValueInput(
+        InputField('schema', 'Schema', 'JSON', { persisted: true }),
+        InputField(
             'resolveRefs',
             'Resolve References',
             'Checkbox',
-            {defaultValue: true}
+            { defaultValue: true }
         )
     ];
 
@@ -63,11 +62,12 @@ class JSONSchemaFakerDynamicValue {
             return refs
         }
 
-        if(Array.isArray(schema)) {
+        if (Array.isArray(schema)) {
             for (let sub of schema) {
                 refs = refs.concat(this._findReferences(sub))
             }
-        } else {
+        }
+        else {
             for (let key of Object.keys(schema)) {
                 refs = refs.concat(this._findReferences(schema[key]))
             }
@@ -100,19 +100,20 @@ class JSONSchemaFakerDynamicValue {
         }
 
         let obj
-        if(Array.isArray(schema)) {
+        if (Array.isArray(schema)) {
             obj = []
             for (let sub of schema) {
                 obj.push(this._deleteReferences(sub, deleteList))
             }
-        } else {
+        }
+        else {
             obj = {}
             for (let key of Object.keys(schema)) {
                 obj[key] = this._findReferences(schema[key], deleteList)
             }
         }
 
-        return refs
+        return obj
     }
 
     _getSchemaDict(domain, _schema, resolveRefs, mainKey) {
