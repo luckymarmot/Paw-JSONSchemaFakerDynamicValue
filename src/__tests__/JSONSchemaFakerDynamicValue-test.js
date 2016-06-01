@@ -37,7 +37,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             return {}
         })
 
-        const expected = undefined
+        let expected
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -62,7 +62,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             return {}
         })
 
-        const expected = undefined
+        let expected
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -87,7 +87,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             return {}
         })
 
-        const expected = undefined
+        let expected
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -284,7 +284,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
                 count: {
                     $ref: '#/definitions/count'
                 },
-                self : {
+                self: {
                     $ref: '#/definitions/middle'
                 }
             }
@@ -310,7 +310,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
                     count: {
                         $ref: '#/definitions/count'
                     },
-                    self : {
+                    self: {
                         $ref: '#/definitions/middle'
                     }
                 }
@@ -344,7 +344,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
                 count: {
                     $ref: '#/definitions/count'
                 },
-                self : {
+                self: {
                     $ref: '#/definitions/middle'
                 },
                 missing: {
@@ -378,7 +378,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
                     count: {
                         $ref: '#/definitions/count'
                     },
-                    self : {
+                    self: {
                         $ref: '#/definitions/middle'
                     },
                     missing: {}
@@ -542,7 +542,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '#/definitions/count': {
                 type: 'integer',
                 minimum: 3,
-                maximum: 4,
+                maximum: 4
             },
             '#/definitions/user': {
                 properties: {
@@ -568,7 +568,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
                 count: {
                     type: 'integer',
                     minimum: 3,
-                    maximum: 4,
+                    maximum: 4
                 },
                 user: {
                     properties: {
