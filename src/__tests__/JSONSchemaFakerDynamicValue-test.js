@@ -9,8 +9,7 @@ import {
 import {
     DynamicString,
     PawContextMock,
-    EnvironmentVariableMock,
-    EnvironmentDomainMock
+    EnvironmentVariableMock
 } from '../__mocks__/PawMocks'
 
 import JSONSchemaFakerDynamicValue from '../JSONSchemaFakerDynamicValue'
@@ -18,31 +17,6 @@ import JSONSchemaFakerDynamicValue from '../JSONSchemaFakerDynamicValue'
 @registerTest
 @against(JSONSchemaFakerDynamicValue)
 export class TestJSONSchemaFakerDynamicValue extends UnitTest {
-
-    @targets('evaluate')
-    @desc('evaluate calls context.getEnvironmentDomainByName')
-    testEvaluateCallsContextGetEnvironmentDomain() {
-        const dv = this.__init()
-        const ctx = new PawContextMock()
-
-        ctx.spyOn('getEnvironmentDomainByName', () => {
-            return 'test'
-        })
-
-        dv.spyOn('_getSchemaDict', () => {
-            return {}
-        })
-
-        dv.spyOn('_materializeSchemas', () => {
-            return {}
-        })
-
-        let expected
-        const result = dv.evaluate(ctx)
-
-        this.assertEqual(expected, result)
-        this.assertEqual(ctx.spy.getEnvironmentDomainByName.count, 1)
-    }
 
     @targets('evaluate')
     @desc('evaluate calls _getSchemaDict')
@@ -118,7 +92,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             return {}
         })
 
-        const expected = 3
+        const expected = '3'
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -154,7 +128,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         })
 
-        const expected = 3
+        const expected = '3'
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -164,7 +138,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
     @desc('_getSchemaDict returns schema at correct key with simple schema')
     testGetSchemaDictSimpleCase() {
         const dv = this.__init()
-        const domain = new EnvironmentDomainMock()
+        const ctx = new PawContextMock()
         const schema = {
             type: 'integer',
             minimum: 3,
@@ -177,17 +151,17 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '@undefined': schema
         }
 
-        const result = dv._getSchemaDict(domain, schema, resolveRefs, key)
+        const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(domain.spy.getVariableByName.count, 0)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 0)
     }
 
     @targets('_getSchemaDict')
     @desc('_getSchemaDict adds refered schemas to dict')
     testGetSchemaDictWithReferences() {
         const dv = this.__init()
-        const domain = new EnvironmentDomainMock()
+        const ctx = new PawContextMock()
         const schema = {
             $ref: '#/definitions/count'
         }
@@ -203,7 +177,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '#/definitions/count': variable
         }
 
-        domain.spyOn('getVariableByName', (name) => {
+        ctx.spyOn('getEnvironmentVariableByName', (name) => {
             return references[name]
         })
 
@@ -216,17 +190,17 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         }
 
-        const result = dv._getSchemaDict(domain, schema, resolveRefs, key)
+        const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(domain.spy.getVariableByName.count, 1)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 1)
     }
 
     @targets('_getSchemaDict')
     @desc('_getSchemaDict adds all refered schemas to dict')
     testGetSchemaDictWithReferencesInReferences() {
         const dv = this.__init()
-        const domain = new EnvironmentDomainMock()
+        const ctx = new PawContextMock()
         const schema = {
             $ref: '#/definitions/middle'
         }
@@ -246,7 +220,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '#/definitions/count': final
         }
 
-        domain.spyOn('getVariableByName', (name) => {
+        ctx.spyOn('getEnvironmentVariableByName', (name) => {
             return references[name]
         })
 
@@ -262,17 +236,17 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         }
 
-        const result = dv._getSchemaDict(domain, schema, resolveRefs, key)
+        const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(domain.spy.getVariableByName.count, 2)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 2)
     }
 
     @targets('_getSchemaDict')
     @desc('_getSchemaDict checks each schema only once')
     testGetSchemaDictWithCircularReferences() {
         const dv = this.__init()
-        const domain = new EnvironmentDomainMock()
+        const ctx = new PawContextMock()
         const schema = {
             $ref: '#/definitions/middle'
         }
@@ -299,7 +273,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '#/definitions/count': final
         }
 
-        domain.spyOn('getVariableByName', (name) => {
+        ctx.spyOn('getEnvironmentVariableByName', (name) => {
             return references[name]
         })
 
@@ -322,17 +296,17 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         }
 
-        const result = dv._getSchemaDict(domain, schema, resolveRefs, key)
+        const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(domain.spy.getVariableByName.count, 3)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 3)
     }
 
     @targets('_getSchemaDict')
     @desc('_getSchemaDict removes occurences to missing schemas')
     testGetSchemaDictWithMissingReferences() {
         const dv = this.__init()
-        const domain = new EnvironmentDomainMock()
+        const ctx = new PawContextMock()
         const schema = {
             $ref: '#/definitions/middle'
         }
@@ -367,7 +341,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             '#/definitions/count': final
         }
 
-        domain.spyOn('getVariableByName', (name) => {
+        ctx.spyOn('getEnvironmentVariableByName', (name) => {
             return references[name]
         })
 
@@ -394,10 +368,10 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         }
 
-        const result = dv._getSchemaDict(domain, schema, resolveRefs, key)
+        const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(domain.spy.getVariableByName.count, 5)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 5)
     }
 
     @targets('_findReferences')
@@ -610,7 +584,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
         const variable = new EnvironmentVariableMock()
         const content = new JSONSchemaFakerDynamicValue()
 
-        content.schema = schema
+        content.schema = JSON.stringify(schema)
         content.type = JSONSchemaFakerDynamicValue.identifier
 
         const dynS = new DynamicString(content)

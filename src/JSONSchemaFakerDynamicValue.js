@@ -14,15 +14,6 @@ export default class JSONSchemaFakerDynamicValue {
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
     static inputs = [
-        new InputField(
-            'domain',
-            'Environment Domain',
-            'String',
-            {
-                persisted: true,
-                defaultValue: 'Schemas'
-            }
-        ),
         new InputField('schema', 'Schema', 'JSON', { persisted: true }),
         new InputField(
             'resolveRefs',
@@ -32,20 +23,12 @@ export default class JSONSchemaFakerDynamicValue {
         )
     ];
 
-    constructor(domainName) {
-        this.ENVIRONMENT_DOMAIN_NAME = domainName || this.domain || 'Schemas'
-    }
-
     evaluate(context) {
-        let domain = context.getEnvironmentDomainByName(
-            this.ENVIRONMENT_DOMAIN_NAME
-        )
-
         let resolveRefs = this.resolveRefs
         let _schema = this.schema
         let mainKey = '@undefined'
         let schemaDict = this._getSchemaDict(
-            domain, _schema, resolveRefs, mainKey
+            context, _schema, resolveRefs, mainKey
         )
 
         let schema = {
@@ -58,10 +41,11 @@ export default class JSONSchemaFakerDynamicValue {
 
         Object.assign(schema, schemas)
 
-        return (jsf(schema) || {}).$$schema
+        let generated = (jsf(schema) || {}).$$schema
+        return JSON.stringify(generated, null, '  ')
     }
 
-    _getSchemaDict(domain, _schema, resolveRefs, mainKey) {
+    _getSchemaDict(context, _schema, resolveRefs, mainKey) {
         let finalDict = {}
         let schemaList = [
             {
@@ -81,13 +65,20 @@ export default class JSONSchemaFakerDynamicValue {
             let toDelete = []
 
             for (let ref of refs) {
-                let variable = domain.getVariableByName(ref)
+                let variable = context.getEnvironmentVariableByName(ref)
                 if (resolveRefs && !done[ref] && variable) {
-                    let value = variable.getCurrentValue().components[0]
+                    let value = variable.getCurrentValue(true).components[0]
+                    let vschema
+                    try {
+                        vschema = JSON.parse(value.schema)
+                    }
+                    catch (e) {
+                        vschema = {}
+                    }
                     if (value.type === JSONSchemaFakerDynamicValue.identifier) {
                         schemaList.push({
                             ref: ref,
-                            schema: value.schema
+                            schema: vschema
                         })
                     }
                     done[ref] = true
