@@ -1,21 +1,18 @@
 if (
     typeof registerDynamicValueClass === 'undefined' ||
-    typeof InputField === 'undefined' ||
-    typeof DynamicValueInput === 'undefined'
+    typeof InputField === 'undefined'
 ) {
     let mocks = require('./PawMocks.js')
     module.exports = {
-        registerDynamicValueClass: mocks.registerImporter,
-        InputField: mocks.DynamicValue,
-        DynamicValueInput: mocks.DynamicString
+        registerDynamicValueClass: mocks.registerDynamicValueClass,
+        InputField: mocks.InputField
     }
 }
 else {
     /* eslint-disable no-undef */
     module.exports = {
         registerDynamicValueClass: registerDynamicValueClass,
-        InputField: InputField,
-        DynamicValueInput: DynamicValueInput
+        InputField: InputField
     }
     /* eslint-enable no-undef */
 }

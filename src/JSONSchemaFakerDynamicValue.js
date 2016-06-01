@@ -6,7 +6,7 @@ import {
 } from './__mocks__/Shims'
 
 @registerDynamicValueClass
-export class JSONSchemaFakerDynamicValue {
+export default class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
     static title = 'JSON Schema Faker'
@@ -14,8 +14,17 @@ export class JSONSchemaFakerDynamicValue {
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
     static inputs = [
-        InputField('schema', 'Schema', 'JSON', { persisted: true }),
-        InputField(
+        new InputField(
+            'domain',
+            'Environment Domain',
+            'String',
+            {
+                persisted: true,
+                defaultValue: 'Schemas'
+            }
+        ),
+        new InputField('schema', 'Schema', 'JSON', { persisted: true }),
+        new InputField(
             'resolveRefs',
             'Resolve References',
             'Checkbox',
@@ -24,7 +33,7 @@ export class JSONSchemaFakerDynamicValue {
     ];
 
     constructor(domainName) {
-        this.ENVIRONMENT_DOMAIN_NAME = domainName || 'Schemas'
+        this.ENVIRONMENT_DOMAIN_NAME = domainName || this.domain || 'Schemas'
     }
 
     evaluate(context) {
@@ -39,15 +48,64 @@ export class JSONSchemaFakerDynamicValue {
             domain, _schema, resolveRefs, mainKey
         )
 
-        let schemas = this._materializeSchemas(schemaDict)
-
         let schema = {
             $$schema: schemaDict[mainKey]
         }
 
+        delete schemaDict[mainKey]
+        let schemas = this._materializeSchemas(schemaDict)
+
+
         Object.assign(schema, schemas)
 
         return (jsf(schema) || {}).$$schema
+    }
+
+    _getSchemaDict(domain, _schema, resolveRefs, mainKey) {
+        let finalDict = {}
+        let schemaList = [
+            {
+                ref: mainKey,
+                schema: _schema
+            }
+        ]
+        let done = {}
+
+        while (schemaList.length > 0) {
+            let obj = schemaList.shift()
+
+            let schema = obj.schema
+            let currentRef = obj.ref
+
+            let refs = this._findReferences(schema)
+            let toDelete = []
+
+            for (let ref of refs) {
+                let variable = domain.getVariableByName(ref)
+                if (resolveRefs && !done[ref] && variable) {
+                    let value = variable.getCurrentValue().components[0]
+                    if (value.type === JSONSchemaFakerDynamicValue.identifier) {
+                        schemaList.push({
+                            ref: ref,
+                            schema: value.schema
+                        })
+                    }
+                    done[ref] = true
+                }
+                else if (
+                    !resolveRefs ||
+                    typeof variable === 'undefined' ||
+                    variable === null
+                ) {
+                    toDelete.push(ref)
+                }
+            }
+
+            let cleanedSchema = this._deleteReferences(schema, toDelete)
+            finalDict[currentRef] = cleanedSchema
+        }
+
+        return finalDict
     }
 
     _findReferences(schema) {
@@ -109,54 +167,11 @@ export class JSONSchemaFakerDynamicValue {
         else {
             obj = {}
             for (let key of Object.keys(schema)) {
-                obj[key] = this._findReferences(schema[key], deleteList)
+                obj[key] = this._deleteReferences(schema[key], deleteList)
             }
         }
 
         return obj
-    }
-
-    _getSchemaDict(domain, _schema, resolveRefs, mainKey) {
-        let finalDict = {}
-        let schemaList = [
-            {
-                ref: mainKey,
-                schema: _schema
-            }
-        ]
-        let done = {}
-
-        while (schemaList.length > 0) {
-            let obj = schemaList.shift()
-
-            let schema = obj.schema
-            let currentRef = obj.ref
-
-            let refs = this._findReferences(schema)
-            let toDelete = []
-
-            for (let ref of refs) {
-                let variable = domain.getVariableByName(ref)
-                if (resolveRefs && !done[ref] && variable) {
-                    let value = variable.getCurrentValue().components[0]
-                    if (value.type === JSONSchemaFakerDynamicValue.identifier) {
-                        schemaList.push({
-                            ref: ref,
-                            schema: value.schema
-                        })
-                    }
-                    done[ref] = true
-                }
-                else if (!resolveRefs || typeof variable === 'undefined') {
-                    toDelete.push(ref)
-                }
-            }
-
-            let cleanedSchema = this._deleteReferences(schema, toDelete)
-            finalDict[currentRef] = cleanedSchema
-        }
-
-        return finalDict
     }
 
     _materializeSchemas(schemas) {
@@ -166,6 +181,7 @@ export class JSONSchemaFakerDynamicValue {
             let obj = baseObj
             for (let fragment of fragments) {
                 obj[fragment] = obj[fragment] || {}
+                obj = obj[fragment]
             }
             Object.assign(obj, schemas[path])
         }
