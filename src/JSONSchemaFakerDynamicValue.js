@@ -1,3 +1,6 @@
+if (typeof Error.captureStackTrace === 'undefined') {
+    Error.captureStackTrace = () => {}
+}
 import jsf from 'json-schema-faker'
 
 import {
@@ -20,10 +23,21 @@ export default class JSONSchemaFakerDynamicValue {
             'Resolve References',
             'Checkbox',
             { defaultValue: true }
+        ),
+        new InputField(
+            'predict',
+            'Guess Formats',
+            'Checkbox',
+            { defaultValue: true }
         )
-    ];
+    ]
 
     evaluate(context) {
+        jsf.option({
+            failOnInvalidTypes: false,
+            defaultInvalidTypeProduct: null
+        })
+
         let resolveRefs = this.resolveRefs
         let _schema = this.schema
         let mainKey = '@undefined'
@@ -41,8 +55,20 @@ export default class JSONSchemaFakerDynamicValue {
 
         Object.assign(schema, schemas)
 
+        if (this.predict) {
+            schema = this._guessFormats(schema)
+        }
+
         let generated = (jsf(schema) || {}).$$schema
-        return JSON.stringify(generated, null, '  ')
+
+        let result
+        if (typeof generated === 'object') {
+            result = JSON.stringify(generated, null, '  ')
+        }
+        else {
+            result = generated
+        }
+        return result
     }
 
     _getSchemaDict(context, _schema, resolveRefs, mainKey) {
@@ -178,5 +204,98 @@ export default class JSONSchemaFakerDynamicValue {
         }
 
         return baseObj
+    }
+
+    _guessFormats(_schema, key) {
+        let schema = _schema
+
+        if (typeof schema !== 'object') {
+            return schema
+        }
+
+        if (schema.type && schema.type === 'string') {
+            schema = this._guessStringFormat(schema, key)
+        }
+        else if (
+            schema.type &&
+            schema.type === 'integer' ||
+            schema.type === 'number'
+        ) {
+            delete schema.format
+        }
+
+        let obj
+        if (Array.isArray(schema)) {
+            obj = []
+            let index = 0
+            for (let sub of schema) {
+                obj.push(this._guessFormats(sub, index))
+                index += 1
+            }
+        }
+        else {
+            obj = {}
+            for (let _key of Object.keys(schema)) {
+                obj[_key] = this._guessFormats(schema[_key], _key)
+            }
+        }
+
+        return obj
+    }
+
+    _guessStringFormat(schema, key) {
+        if (schema.faker) {
+            return schema
+        }
+
+        if (schema.format) {
+            let format = schema.format
+            delete schema.format
+            if (format === 'email') {
+                schema.faker = 'internet.email'
+            }
+            else if (format === 'password') {
+                schema.faker = 'internet.password'
+            }
+            else if (format === 'date-time') {
+                schema.faker = 'date.recent'
+            }
+            else if (format === 'url') {
+                schema.faker = 'internet.url'
+            }
+            else if (format === 'date' && !schema.pattern) {
+                schema.pattern = '^20[0-2][0-9]-0[1-9]-[0-2][1-8]$'
+            }
+            else if (format === 'byte' && !schema.pattern) {
+                schema.pattern = '^(?:[A-Za-z0-9+/]{4})*' +
+                    '(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$'
+            }
+            else if (format === 'binary' && !schema.pattern) {
+                schema.pattern = '^.*$'
+            }
+            return schema
+        }
+
+        if (key.match(/email/i)) {
+            schema.faker = 'internet.email'
+        }
+        else if (key.match(/name/i)) {
+            schema.faker = 'name.findName'
+        }
+        else if (key.match(/phone/i)) {
+            schema.faker = 'phone.phoneNumberFormat'
+        }
+        else if (key.match(/url/i)) {
+            schema.faker = 'internet.url'
+        }
+        else if (
+            typeof schema.pattern === 'undefined' &&
+            typeof schema.minLength === 'undefined' &&
+            typeof schema.maxLength === 'undefined'
+        ) {
+            schema.faker = 'company.bsNoun'
+        }
+
+        return schema
     }
 }
