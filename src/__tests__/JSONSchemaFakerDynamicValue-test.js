@@ -1,9 +1,9 @@
 import {
-	UnitTest, registerTest, against, targets, desc
+    UnitTest, registerTest, against, targets, desc
 } from '../__utils__/TestUtils'
 
 import {
-	ClassMock
+    ClassMock
 } from '../__mocks__/Mocks'
 
 import {
@@ -92,7 +92,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             return {}
         })
 
-        const expected = '3'
+        const expected = 3
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -128,7 +128,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
             }
         })
 
-        const expected = '3'
+        const expected = 3
         const result = dv.evaluate(ctx)
 
         this.assertEqual(expected, result)
@@ -570,6 +570,76 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
         const result = dv._materializeSchemas(schemaDict)
 
         this.assertEqual(expected, result)
+    }
+
+    @targets('_guessFormats')
+    @desc('_guessFormats removes unusable integer formats')
+    testGuessFormatsRemovesUnusableIntegerFormats() {
+        const dv = this.__init()
+        const schema = {
+            type: 'integer',
+            minimum: 3,
+            maximum: 4,
+            format: 'uint32'
+        }
+
+        const expected = {
+            type: 'integer',
+            minimum: 3,
+            maximum: 4
+        }
+
+        const result = dv._guessFormats(schema)
+
+        this.assertEqual(expected, result)
+    }
+
+    @targets('_guessFormats')
+    @desc('_guessFormats removes unusable number formats')
+    testGuessFormatsRemovesUnusableNumberFormats() {
+        const dv = this.__init()
+        const schema = {
+            type: 'number',
+            minimum: 3,
+            maximum: 4,
+            format: 'float'
+        }
+
+        const expected = {
+            type: 'number',
+            minimum: 3,
+            maximum: 4
+        }
+
+        const result = dv._guessFormats(schema)
+
+        this.assertEqual(expected, result)
+    }
+
+    @targets('_guessFormats')
+    @desc('_guessFormats calls _guessStringFormat')
+    testGuessFormatsCallsGuessStringFormat() {
+        const dv = this.__init()
+
+        dv.spyOn('_guessStringFormat', () => {
+            return {}
+        })
+
+        const schema = {
+            type: 'string',
+            minimum: 3,
+            maximum: 4
+        }
+
+        dv._guessFormats(schema)
+
+        this.assertEqual(dv.spy._guessStringFormat.count, 1)
+    }
+
+    @targets('_guessStringFormat')
+    @desc('_ignored')
+    _testGuessStringFormat() {
+        // TODO
     }
 
     __init(schema, resolveRefs = true, domainName) {
