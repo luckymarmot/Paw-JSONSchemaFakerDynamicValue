@@ -5,7 +5,7 @@ to create the most accurate fake data you may want to generate.
 ## Introduction to using Faker with JSON Schema
 JSON schemas are pretty amazing when it comes to describing the overall architecture of a JSON object. This makes it a very helpful tool to describe what your API expects and returns.
 
-Thanks to json-schema-faker, you can automatically generate data that is in line with what your API expects. The JSON Schema faker tries to make the most out of Faker.js and allows you to integrate it in a very simple fashion, because who doesn't prefer having 'Mittie15@example.com' instead of '2vNiY7VNko@csJmI.com' ?
+Thanks to json-schema-faker, you can automatically generate data that is in line with what your API expects. The JSON Schema faker Dynamic Value tries to make the most out of Faker.js and allows you to integrate it in a very simple fashion, because who doesn't prefer having 'Mittie15@example.com' instead of '2vNiY7VNko@csJmI.com' ?
 
 
 ## Table of Content
