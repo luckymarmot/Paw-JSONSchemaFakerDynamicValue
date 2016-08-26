@@ -32,10 +32,6 @@ export default class JSONSchemaFakerDynamicValue {
         )
     ]
 
-    title() {
-        return 'JSF'
-    }
-
     evaluate(context) {
         jsf.option({
             failOnInvalidTypes: false,
