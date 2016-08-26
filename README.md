@@ -193,7 +193,9 @@ This structure can be used with the following values:
 
 ## JSON Schema Quickstart
 If you are not very familiar with JSON Schemas, this should help you get the basics.
-We strongly advise to read the [RFC drafts](http://json-schema.org/documentation.html) to better understand the intricacies of JSON Schemas.
+
+The guys at the [Space Telescope Science Institute](https://github.com/spacetelescope) have made an awesome documentation about JSON Schemas, that's infinitely better than anything I could produce, and that you should [definitely check out](https://spacetelescope.github.io/understanding-json-schema/)
+
 This extension is not fully compliant with the more advanced use of JSON Schemas, unfortunately.
 
 ### JSON Schema Introduction

@@ -9,7 +9,7 @@ import {
 export default class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
-    static title = 'JSON Schema Faker'
+    static title = 'JSF'
     static help =
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
@@ -42,6 +42,11 @@ export default class JSONSchemaFakerDynamicValue {
         Object.assign(schema, schemas)
 
         let generated = (jsf(schema) || {}).$$schema
+
+        if (typeof generated === 'string') {
+            return generated
+        }
+
         return JSON.stringify(generated, null, '  ')
     }
 
