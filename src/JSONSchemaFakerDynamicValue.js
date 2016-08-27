@@ -12,7 +12,7 @@ import {
 export default class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
-    static title = 'JSF'
+    static title = '\uD83C\uDFA9'
     static help =
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
@@ -29,10 +29,35 @@ export default class JSONSchemaFakerDynamicValue {
             'Guess Formats',
             'Checkbox',
             { defaultValue: true }
+        ),
+        new InputField(
+            'changeName',
+            'use x-title as name',
+            'Checkbox',
+            { defaultValue: true }
         )
     ]
 
+    constructor() {
+        this.context = null
+    }
+
+    text() {
+        if (this.schema) {
+            if (typeof this.schema.title === 'string') {
+                return this.schema.title
+            }
+            else if (typeof this.schema['x-title'] === 'string') {
+                return this.schema['x-title']
+            }
+        }
+
+        return 'JSF'
+    }
+
     evaluate(context) {
+        this.context = context
+
         jsf.option({
             failOnInvalidTypes: false,
             defaultInvalidTypeProduct: null
