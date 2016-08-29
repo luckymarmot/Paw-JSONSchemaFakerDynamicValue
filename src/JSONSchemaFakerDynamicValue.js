@@ -32,9 +32,9 @@ export default class JSONSchemaFakerDynamicValue {
         ),
         new InputField(
             'changeName',
-            'use x-title as name',
+            'Do not use x-title as name',
             'Checkbox',
-            { defaultValue: true, persisted: true }
+            { defaultValue: false, persisted: true }
         )
     ]
 
@@ -44,7 +44,7 @@ export default class JSONSchemaFakerDynamicValue {
 
     title() {
         if (
-            this.changeName &&
+            !this.changeName &&
             this.schema &&
             (
                 typeof this.schema.title === 'string' ||
@@ -58,7 +58,7 @@ export default class JSONSchemaFakerDynamicValue {
     }
 
     text() {
-        if (this.changeName && this.schema) {
+        if (!this.changeName && this.schema) {
             if (typeof this.schema.title === 'string') {
                 return this.schema.title
             }
