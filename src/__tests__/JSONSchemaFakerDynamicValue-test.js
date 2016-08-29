@@ -642,6 +642,12 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
         // TODO
     }
 
+    @targets('title')
+    @desc('_ignored')
+    _testTitle() {
+        // TODO
+    }
+
     @targets('text')
     @desc('_ignored')
     _testText() {
