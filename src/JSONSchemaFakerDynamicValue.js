@@ -12,9 +12,9 @@ import {
 export default class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
-    static title = 'JSON Schema Faker'
     static help =
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
+    static title = 'JSF'
 
     static inputs = [
         new InputField('schema', 'Schema', 'JSON', { persisted: true }),
@@ -22,21 +22,57 @@ export default class JSONSchemaFakerDynamicValue {
             'resolveRefs',
             'Resolve References',
             'Checkbox',
-            { defaultValue: true }
+            { defaultValue: true, persisted: true }
         ),
         new InputField(
             'predict',
             'Guess Formats',
             'Checkbox',
-            { defaultValue: true }
+            { defaultValue: true, persisted: true }
+        ),
+        new InputField(
+            'changeName',
+            'Do not use x-title as name',
+            'Checkbox',
+            { defaultValue: false, persisted: true }
         )
     ]
 
+    constructor() {
+        this.context = null
+    }
+
     title() {
-        return 'JSF'
+        if (
+            !this.changeName &&
+            this.schema &&
+            (
+                typeof this.schema.title === 'string' ||
+                typeof this.schema['x-title'] === 'string'
+            )
+        ) {
+            return '\uD83C\uDFA9'
+        }
+
+        return 'JSF \uD83C\uDFA9'
+    }
+
+    text() {
+        if (!this.changeName && this.schema) {
+            if (typeof this.schema.title === 'string') {
+                return this.schema.title
+            }
+            else if (typeof this.schema['x-title'] === 'string') {
+                return this.schema['x-title']
+            }
+        }
+
+        return null
     }
 
     evaluate(context) {
+        this.context = context
+
         jsf.option({
             failOnInvalidTypes: false,
             defaultInvalidTypeProduct: null

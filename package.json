@@ -31,6 +31,9 @@
     "mocha": "2.4.5",
     "webpack": "1.12.14"
   },
+  "eslintConfig": {
+    "extends": "./linting/prod.yaml"
+  },
   "scripts": {
     "build": "rm -rf build/ && BUILD_ENV=build ./node_modules/.bin/webpack --bail --display-error-details",
     "test": "$npm_package_options_mocha \"src/**/__tests__/*-test.js\"",

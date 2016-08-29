@@ -642,6 +642,18 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
         // TODO
     }
 
+    @targets('title')
+    @desc('_ignored')
+    _testTitle() {
+        // TODO
+    }
+
+    @targets('text')
+    @desc('_ignored')
+    _testText() {
+        // TODO
+    }
+
     __init(schema, resolveRefs = true, domainName) {
         const dv = new ClassMock(new JSONSchemaFakerDynamicValue(domainName))
         dv.schema = schema
