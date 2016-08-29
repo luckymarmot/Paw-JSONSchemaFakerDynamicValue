@@ -22,19 +22,19 @@ export default class JSONSchemaFakerDynamicValue {
             'resolveRefs',
             'Resolve References',
             'Checkbox',
-            { defaultValue: true }
+            { defaultValue: true, persisted: true }
         ),
         new InputField(
             'predict',
             'Guess Formats',
             'Checkbox',
-            { defaultValue: true }
+            { defaultValue: true, persisted: true }
         ),
         new InputField(
             'changeName',
             'use x-title as name',
             'Checkbox',
-            { defaultValue: true }
+            { defaultValue: true, persisted: true }
         )
     ]
 
@@ -44,6 +44,7 @@ export default class JSONSchemaFakerDynamicValue {
 
     title() {
         if (
+            this.changeName &&
             this.schema &&
             (
                 typeof this.schema.title === 'string' ||
@@ -57,7 +58,7 @@ export default class JSONSchemaFakerDynamicValue {
     }
 
     text() {
-        if (this.schema) {
+        if (this.changeName && this.schema) {
             if (typeof this.schema.title === 'string') {
                 return this.schema.title
             }
