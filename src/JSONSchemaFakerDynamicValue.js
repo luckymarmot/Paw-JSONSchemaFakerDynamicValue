@@ -14,6 +14,7 @@ export default class JSONSchemaFakerDynamicValue {
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
     static help =
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
+    static title = 'JSF'
 
     static inputs = [
         new InputField('schema', 'Schema', 'JSON', { persisted: true }),
