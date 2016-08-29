@@ -12,7 +12,6 @@ import {
 export default class JSONSchemaFakerDynamicValue {
     static identifier =
         'com.luckymarmot.PawExtensions.JSONSchemaFakerDynamicValue'
-    static title = '\uD83C\uDFA9'
     static help =
         'https://github.com/luckymarmot/Paw-JSONSchemaFakerDynamicValue'
 
@@ -42,6 +41,20 @@ export default class JSONSchemaFakerDynamicValue {
         this.context = null
     }
 
+    title() {
+        if (
+            this.schema &&
+            (
+                typeof this.schema.title === 'string' ||
+                typeof this.schema['x-title'] === 'string'
+            )
+        ) {
+            return '\uD83C\uDFA9'
+        }
+
+        return 'JSF \uD83C\uDFA9'
+    }
+
     text() {
         if (this.schema) {
             if (typeof this.schema.title === 'string') {
@@ -52,7 +65,7 @@ export default class JSONSchemaFakerDynamicValue {
             }
         }
 
-        return 'JSF'
+        return null
     }
 
     evaluate(context) {
