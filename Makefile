@@ -28,4 +28,4 @@ lint:
 check: test lint
 
 archive: build
-	cd ./build/; zip -r JsonWebTokenDynamicValue.zip "$(identifier)/"
+	cd ./build/; zip -r JSONSchemaFakerDynamicValue.zip "$(identifier)/"
