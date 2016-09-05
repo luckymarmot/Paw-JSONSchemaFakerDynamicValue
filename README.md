@@ -332,10 +332,10 @@ npm install
 npm run build
 ```
 
-### Install
+### Use the build locally (on your machine)
 
 ```shell
-make install
+make local
 ```
 
 ### Test
