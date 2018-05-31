@@ -132,20 +132,36 @@ export default class JSONSchemaFakerDynamicValue {
 
             for (let ref of refs) {
                 let variable = context.getEnvironmentVariableByName(ref)
+                if (!variable && ref.indexOf('#/definitions') === 0) {
+                    variable = context.getEnvironmentVariableByName(ref.slice(14))
+                }
                 if (resolveRefs && !done[ref] && variable) {
                     let value = variable.getCurrentValue(true).components[0]
                     let vschema
-                    try {
-                        vschema = JSON.parse(value.schema)
-                    }
-                    catch (e) {
-                        vschema = {}
-                    }
-                    if (value.type === JSONSchemaFakerDynamicValue.identifier) {
+                    if (value.type === 'com.luckymarmot.JSONDynamicValue') {
+                        try {
+                            vschema = JSON.parse(value.json)
+                        }
+                        catch (e) {
+                            vschema = {}
+                        }
                         schemaList.push({
                             ref: ref,
                             schema: vschema
                         })
+                    } else {
+                        try {
+                            vschema = JSON.parse(value.schema)
+                        }
+                        catch (e) {
+                            vschema = {}
+                        }
+                        if (value.type === JSONSchemaFakerDynamicValue.identifier) {
+                            schemaList.push({
+                                ref: ref,
+                                schema: vschema
+                            })
+                        }
                     }
                     done[ref] = true
                 }

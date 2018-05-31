@@ -371,7 +371,7 @@ export class TestJSONSchemaFakerDynamicValue extends UnitTest {
         const result = dv._getSchemaDict(ctx, schema, resolveRefs, key)
 
         this.assertEqual(expected, result)
-        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 5)
+        this.assertEqual(ctx.spy.getEnvironmentVariableByName.count, 7)
     }
 
     @targets('_findReferences')
